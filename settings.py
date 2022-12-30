@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -24,11 +25,11 @@ SECRET_KEY = '$lu_w2br(x6zeo2c)lz6o2l#iw-)sx+ca))2)f_pr9gqf!4v7!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['public.com', 'mcd.com','teapost.com']
+ALLOWED_HOSTS = ['public.com', 'mcd.com', 'teapost.com']
 
 CORS_ALLOW_ALL_ORIGINS = True  # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = ['http://mcd.com:8004', 'http://public.com:8004','http://teapost.com:8004']
+CORS_ALLOWED_ORIGINS = ['http://mcd.com:8004', 'http://public.com:8004', 'http://teapost.com:8004']
 # Application definition
 
 AUTH_USER_MODEL = 'core.User'
@@ -56,6 +57,8 @@ SHARED_APPS = (
     "debug_toolbar",
     'corsheaders',
     'drf_yasg',
+    'django_celery_results',
+    'django_celery_beat',
     'core',
 )
 
@@ -212,3 +215,20 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+# Celery Settings
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = os.environ.get('REDIS_PORT')
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_WORKER_REDIRECT_STDOUTS = False
