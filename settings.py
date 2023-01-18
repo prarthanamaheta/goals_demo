@@ -32,7 +32,7 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = ['http://mcd.com:8004', 'http://public.com:8004', 'http://teapost.com:8004']
 # Application definition
 
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'users.User'
 # tenant settings
 
 
@@ -47,30 +47,49 @@ SHARED_APPS = (
     'django_tenants',
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.contenttypes',
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_swagger',
     'django_filters',
-    "debug_toolbar",
+    'allauth',
+    'allauth.account',
     'corsheaders',
     'drf_yasg',
-    'django_celery_results',
-    'django_celery_beat',
     'core',
+    'users',
+    'crispy_forms',
+    'debug_toolbar',
 )
 
 TENANT_APPS = (
     'demo_django',
     'demo_drf',
+    'users',
+    'django_celery_results',
+    'django_celery_beat',
+    'django.contrib.admin',
+
 )
 
 INSTALLED_APPS = list(SHARED_APPS) + [
     app for app in TENANT_APPS if app not in SHARED_APPS
 ]
 
+INTERNAL_IPS = [
+    "teapost.com",
+]
+
+
+def show_toolbar(request):
+    return True
+
+
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": show_toolbar,
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -89,7 +108,7 @@ ROOT_URLCONF = 'goals_demo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -212,15 +231,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
 
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static-cdn')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+# DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 

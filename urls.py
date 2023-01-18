@@ -6,6 +6,9 @@ from django.contrib import admin
 from django.urls import path, re_path
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import permissions
+from django.conf.urls.static import static
+
+from goals_demo import settings
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -21,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('django/', include('demo_django.urls')),
     path('drf/', include('demo_drf.urls')),
+    path('user/', include('users.urls')),
     re_path(
         r"^drf/docs/swagger/$",
         schema_view.with_ui("swagger", cache_timeout=0),
@@ -33,3 +37,5 @@ urlpatterns = [
     ),
     path('__debug__/', include('debug_toolbar.urls')),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
